@@ -1,0 +1,39 @@
+version: '2.1'
+services:
+
+  # Application
+  phpapp:
+    build:
+      context: ./docker
+      dockerfile: phpapp.dockerfile
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+
+  # Web Server
+  webserver:
+    build:
+      context: ./docker
+      dockerfile: webserver.dockerfile
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    depends_on:
+      - "phpapp"
+    ports:
+      - 80:80
+
+  # Database
+  database:
+    image: mysql:8.0
+    volumes:
+      - dbdata:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    ports:
+      - 33061:3306
+volumes:
+  dbdata:
